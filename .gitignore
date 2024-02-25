@@ -1,0 +1,55 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Local development settings
+.env
+
+# Database
+db.sqlite3
+
+# Static files
+/static/
+
+# Media files
+/media/
+
+# Virtual environment
+venv/
+env/
+
+# Django configuration
+*.log
+*.pot
+*.pyc
+local_settings.py
+
+# macOS system files
+.DS_Store
+
+# Editor-specific files
+.vscode/
+*.swp
+*.swo
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# Celery
+celerybeat-schedule
+
+# Coverage directory
+htmlcov/
+
+# Python debugger
+.pyc
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Dependency directories
+node_modules/
