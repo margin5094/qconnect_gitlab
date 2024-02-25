@@ -1,6 +1,6 @@
-from django.db import models
+from djongo import models
 
 class Repository(models.Model):
-    name = models.CharField(max_length=255)
-    url = models.URLField()
-    # Add more fields as needed
+    # Define your MongoDB model fields here
+    name = models.CharField(max_length=100)
+    # Add other fields as needed

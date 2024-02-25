@@ -81,6 +81,10 @@ DATABASES = {
         'NAME': 'gitlab',
         'CLIENT': {
            'host': 'mongodb+srv://margin0607:margin123@cluster0.viezalv.mongodb.net/',
+           'port': 27017,
+            'username': 'margin0607',
+            'password': 'margin123',
+            
         }
     }
 }

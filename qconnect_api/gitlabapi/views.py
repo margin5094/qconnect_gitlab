@@ -1,39 +1,30 @@
-import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Repository
+from .services import RepositoryService
 
 class RepositoryInfoAPIView(APIView):
     def get(self, request):
-        # Extract access token from the header
         access_token = request.headers.get('Authorization')
-        print(f'access token: {access_token}')
-        # GitLab API endpoint for listing repositories
-        gitlab_api_url = 'https://git.cs.dal.ca/api/v4/projects'
-        params = {'owned': 'yes'}
-        # Set up headers for the GitLab API request
-        headers = {
-            'Authorization': f'{access_token}',
-        }
 
         try:
-            # Make a request to GitLab API to fetch repositories
-            response = requests.get(gitlab_api_url, headers=headers, params=params)
-            
-            # Check if the request was successful (status code 200)
-            if response.status_code == 200:
-                # Parse the JSON response from GitLab
-                repositories_data = response.json()
-                # print(f'Response: {repositories_data}')
-                
-                
-                return Response(repositories_data, status=status.HTTP_200_OK)
-                
-            else:
-                # Return an error response if the GitLab API request was not successful
-                return Response({'error': 'Failed to fetch repository information from GitLab'}, status=response.status_code)
+            repositories_data = RepositoryService.get_gitlab_repositories(access_token)
+            return Response(repositories_data, status=status.HTTP_200_OK)
 
         except Exception as e:
-            # Handle exceptions, such as network errors or invalid JSON response
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class AddRepositoryAPIView(APIView):
+    def post(self, request):
+        repository_id = request.data.get('id')
+        access_token = request.data.get('access_token')
+
+        if not repository_id or not access_token:
+            return Response({'error': 'Repository ID and access token are required in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            result = RepositoryService.add_repository(repository_id, access_token)
+            return Response(result, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
