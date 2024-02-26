@@ -1,7 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .services import RepositoryService
+from .services import RepositoryService, GitUserService, GitLabService
+from datetime import datetime
 
 class RepositoryInfoAPIView(APIView):
     def get(self, request):
@@ -11,20 +12,61 @@ class RepositoryInfoAPIView(APIView):
             repositories_data = RepositoryService.get_gitlab_repositories(access_token)
             return Response(repositories_data, status=status.HTTP_200_OK)
 
-        except Exception as e:
+        except Exception as e: 
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class AddRepositoryAPIView(APIView):
     def post(self, request):
         repository_id = request.data.get('id')
-        access_token = request.data.get('access_token')
+        access_token = request.headers.get('Authorization')
 
         if not repository_id or not access_token:
-            return Response({'error': 'Repository ID and access token are required in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Repository ID and access token are required in the request.'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             result = RepositoryService.add_repository(repository_id, access_token)
             return Response(result, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class TopGitUsersAPIView(APIView):
+    def post(self, request):
+        start_date = request.query_params.get('startDate')
+        end_date = request.query_params.get('endDate')
+        repository_ids = request.query_params.getlist('repositoryIds')
+        access_token = request.headers.get('Authorization')
+        print(f"{repository_ids}")
+        try:
+            # Call a service method to fetch top 5 git users
+            top_git_users = GitUserService.get_top_git_users(start_date, end_date, repository_ids,access_token)
+
+            return Response(top_git_users, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ActiveContributorsCountAPIView(APIView):
+    def post(self, request):
+        start_date_str = request.query_params.get('startDate')
+        end_date_str = request.query_params.get('endDate')
+        repository_ids = request.query_params.getlist('repositoryIds')
+        print(f"{repository_ids}")
+        if not (start_date_str and end_date_str and repository_ids):
+            return Response({'error': 'startDate, endDate, and repositoryIds are required in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            start_date = datetime.strptime(start_date_str, '%Y-%d-%m')
+            end_date = datetime.strptime(end_date_str, '%Y-%d-%m')
+
+            # Format datetime objects to the desired output format
+            start_date_formatted = start_date.strftime('%Y-%m-%dT00:00:00.000Z')
+            end_date_formatted = end_date.strftime('%Y-%m-%dT00:00:00.000Z')
+
+            access_token = request.headers.get('Authorization')
+            count = GitLabService.get_active_contributors_count(repository_ids, start_date_formatted, end_date_formatted, access_token)
+            
+            return Response({'count': count}, status=status.HTTP_200_OK)
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
