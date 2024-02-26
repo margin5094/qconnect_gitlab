@@ -70,3 +70,45 @@ class ActiveContributorsCountAPIView(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+class GitUsersActiveAPIView(APIView):
+    def post(self, request):
+        start_date_str = request.query_params.get('startDate')
+        end_date_str = request.query_params.get('endDate')
+        repository_ids = request.query_params.getlist('repositoryIds')
+
+        if not (start_date_str and end_date_str and repository_ids):
+            return Response({'error': 'startDate, endDate, and repositoryIds are required in the request body.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+
+            start_date = datetime.strptime(start_date_str, '%Y-%d-%m')
+            end_date = datetime.strptime(end_date_str, '%Y-%d-%m')
+
+            # Format datetime objects to the desired output format
+            start_date_formatted = start_date.strftime('%Y-%m-%dT00:00:00.000Z')
+            end_date_formatted = end_date.strftime('%Y-%m-%dT00:00:00.000Z')
+
+            access_token = request.headers.get('Authorization')
+
+            # Fetch active contributors
+            active_contributors_data = GitLabService.get_active_contributors_count(repository_ids, start_date_formatted, end_date_formatted, access_token)
+            # print(f'{active_contributors_data}')
+            # Fetch total contributors for each date
+            total_contributors_data = GitLabService.get_total_contributors_count(repository_ids, access_token)
+            # print(f'{total_contributors_data}')
+            # Combine the data for response
+            response_data = []
+
+            # Assuming active_contributors_data and total_contributors_data are single values
+            response_data.append({
+                'dates': [start_date_formatted, end_date_formatted],  # Add your desired date format
+                'activeUsers': [active_contributors_data],
+                'totalUsers': [total_contributors_data],
+            })
+
+
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

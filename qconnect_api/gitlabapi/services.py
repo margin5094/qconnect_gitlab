@@ -129,7 +129,8 @@ class GitLabService:
         params = {
             'since': start_date,
             'until': end_date,
-            'ref_name':branch_name
+            'ref_name':branch_name,
+            'per_page':100000
         }
         headers = {
             'Authorization': f'{access_token}',
@@ -145,10 +146,10 @@ class GitLabService:
     @staticmethod
     def extract_unique_contributors(commits_data):
         unique_contributors = set()
-
+        
         for commit in commits_data:
             unique_contributors.add(commit['author_email'])
-
+       
         return unique_contributors
 
     @staticmethod
@@ -160,10 +161,10 @@ class GitLabService:
             branches_data = GitLabService.fetch_repository_branches(repo_id, access_token)
             for branch in branches_data:
                 branch_name = branch['name']
-                commits_data = GitLabService.fetch_commits_for_branch(repo_id, branch_name, start_date, end_date, access_token)
+                commits_data = GitLabService.fetch_commits_for_branch(repo_id, branch_name, start_date, end_date, access_token)   
                 unique_contributors.update(GitLabService.extract_unique_contributors(commits_data))
 
-
+        # print(f'{unique_contributors}')
         return len(unique_contributors)
     
     @staticmethod
@@ -179,3 +180,29 @@ class GitLabService:
             return response.json()
         else:
             raise Exception(f'Failed to fetch repository branches. Status code: {response.status_code}')
+                #-----------------------------------------------------------
+    @staticmethod
+    def get_total_contributors_count(repository_ids, access_token):
+        total_contributors_emails = set()
+
+        for repo_id in repository_ids:
+            contributors_data = GitLabService.fetch_total_contributors(repo_id, access_token)
+            contributors_emails = {contributor['email'] for contributor in contributors_data}
+            total_contributors_emails.update(contributors_emails)
+
+        total_all_repositories = len(total_contributors_emails)
+        return total_all_repositories
+
+    @staticmethod
+    def fetch_total_contributors(repo_id, access_token):
+        contributors_url = f'https://git.cs.dal.ca/api/v4/projects/{repo_id}/repository/contributors'
+        headers = {
+            'Authorization': f'{access_token}',
+        }
+
+        response = requests.get(contributors_url, headers=headers)
+
+        if response.status_code == 200:
+            return response.json()
+        else:
+            raise Exception(f'Failed to fetch total contributors for repository {repo_id}. Status code: {response.status_code}')
