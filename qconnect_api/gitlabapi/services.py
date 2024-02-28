@@ -1,7 +1,7 @@
 import requests
 from .models import Repository
-from .models import Commit
-from datetime import datetime
+from django.http import JsonResponse
+from rest_framework.response import Response
 
 class RepositoryService:
     @staticmethod
@@ -206,3 +206,57 @@ class GitLabService:
             return response.json()
         else:
             raise Exception(f'Failed to fetch total contributors for repository {repo_id}. Status code: {response.status_code}')
+
+    # Newly created Merge Request code
+    @staticmethod
+    def get_active_merge_requests(access_token, repository_ids, start_date, end_date):
+        result = []
+
+        api_url = "https://git.cs.dal.ca/api/v4"
+
+        for repository_id in repository_ids:
+            url = f"{api_url}/projects/{repository_id}/merge_requests"
+            headers = {
+                'Authorization': f'{access_token}',
+            }
+
+            # Parameters for active merge requests
+            active_params = {
+                "state": "opened",
+                "created_before": end_date,
+                'per_page': 100000
+            }
+
+            # Parameters for newly created merge requests
+            newly_created_params = {
+                "created_after": start_date,
+                "created_before": end_date,
+                'per_page': 100000
+            }
+
+            # Get active merge requests
+            active_response = requests.get(url, headers=headers, params=active_params)
+
+            if active_response.status_code == 200:
+                active_merge_requests = active_response.json()
+                active_merge_request_count = len(active_merge_requests)
+            else:
+                return Response({"error": f"Failed to fetch active merge requests for repository {repository_id}"}, status=active_response.status_code)
+
+            # Get newly created merge requests
+            newly_created_response = requests.get(url, headers=headers, params=newly_created_params)
+
+            if newly_created_response.status_code == 200:
+                newly_created_merge_requests = newly_created_response.json()
+                newly_created_merge_request_count = len(newly_created_merge_requests)
+            else:
+                return Response({"error": f"Failed to fetch newly created merge requests for repository {repository_id}"}, status=newly_created_response.status_code)
+
+            # Append the result for this repository to the list
+            result.append({
+                "dates": [end_date],
+                "active": [active_merge_request_count],
+                "newly_created": [newly_created_merge_request_count],
+            })
+
+        return result

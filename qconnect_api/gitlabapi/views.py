@@ -112,3 +112,29 @@ class GitUsersActiveAPIView(APIView):
 
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class GitUsersMergeRequestActiveAPIView(APIView):
+    def post(self, request):
+        try:
+            access_token = request.headers.get('Authorization')
+            start_date_str = request.query_params.get('startDate')
+            end_date_str = request.query_params.get('endDate')
+            repository_ids = request.query_params.getlist('repositoryIds')
+
+            if not access_token or not repository_ids or not start_date_str or not end_date_str:
+                return Response({"error": "Missing required parameters"}, status=status.HTTP_400_BAD_REQUEST)
+
+            start_date = datetime.strptime(start_date_str, '%Y-%d-%m')
+            end_date = datetime.strptime(end_date_str, '%Y-%d-%m')
+
+            # Format datetime objects to the desired output format
+            start_date_formatted = start_date.strftime('%Y-%m-%dT00:00:00.000Z')
+            end_date_formatted = end_date.strftime('%Y-%m-%dT00:00:00.000Z')
+
+
+            result = GitLabService.get_active_merge_requests(access_token, repository_ids, start_date_formatted, end_date_formatted)
+
+            return Response(result, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
