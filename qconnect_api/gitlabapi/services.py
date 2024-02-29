@@ -223,7 +223,7 @@ class GitLabService:
             # Parameters for active merge requests
             active_params = {
                 "state": "opened",
-                "created_before": end_date,
+                "created_before": start_date,
                 'per_page': 100000
             }
 

@@ -2,6 +2,6 @@ from django.contrib import admin
 from django.urls import path,include
 
 urlpatterns = [
-  
-    path('api/', include('gitlabapi.urls')),
+    path('aapi/', include('gitlabapi.urls')),
+    path('api/', include('mongoAPI.urls')), 
 ]
