@@ -3,38 +3,26 @@ from mongoAPI.models.MergeRequestModel import MergeRequest
 from mongoAPI.models.CommitsModel import Commit
 from mongoAPI.models.ContributorsModel import RepositoryContributors
 from django.db import IntegrityError
+from datetime import datetime
 
 def fetch_and_store_merge_requests(repositoryId, access_token):
     url = f"https://git.cs.dal.ca/api/v4/projects/{repositoryId}/merge_requests"
-    headers = {
-        'Authorization': f'Bearer {access_token}',
-    }
-    params = {
-        'per_page': 100000
-    }
+    headers = {'Authorization': f'Bearer {access_token}'}
+    params = {'per_page': 100}
     response = requests.get(url, headers=headers, params=params)
     
     if response.status_code == 200:
         merge_requests = response.json()
         
-        # Fetch existing merge request IDs for the repositoryId
-        existing_mr_ids = set(MergeRequest.objects.filter(repositoryId=repositoryId)
-                                              .values_list('merge_request_id', flat=True))
-        
-        # Prepare data for bulk insertion
-        merge_requests_to_create = []
         for mr in merge_requests:
-            # Check if the merge request already exists
-            if mr['id'] not in existing_mr_ids:
-                merge_requests_to_create.append(MergeRequest(
-                    repositoryId=repositoryId,
-                    merge_request_id=mr['id'],
-                    data=mr  # Store the entire merge request data as is
-                ))
-        
-        # Bulk create merge requests
-        MergeRequest.objects.bulk_create(merge_requests_to_create)
-        
+            created_at = datetime.strptime(mr['created_at'], "%Y-%m-%dT%H:%M:%S.%f%z").isoformat()
+            merged_at = datetime.strptime(mr['merged_at'], "%Y-%m-%dT%H:%M:%S.%f%z").isoformat()
+            obj, created = MergeRequest.objects.get_or_create(
+                repositoryId=repositoryId,
+                merge_request_id=mr['id'],
+                defaults={'state': mr['state'], 'created_at': created_at,'merged_at':merged_at}
+            )
+
     else:
         raise Exception("Failed to fetch merge requests from the API.")
 
@@ -77,23 +65,23 @@ def fetch_and_store_commits(repository_id, access_token):
     # Convert the dictionary back to a list for further processing or storing
     all_commits = list(all_commits_dict.values())
     
-    # Fetch existing commit IDs to avoid duplication
-    existing_commit_ids = set(Commit.objects.all().values_list('commitId', flat=True))
+    # Fetch existing combinations of commit IDs and repository IDs to avoid duplication
+    existing_combinations = set(Commit.objects.filter(repositoryId=repository_id).values_list('commitId', flat=True))
     
-    # Prepare data for bulk insertion, excluding commits that already exist
+    # Prepare data for bulk insertion, excluding commits that already exist for the repository
     commits_to_create = []
     for commit in all_commits:
-        if commit['id'] not in existing_commit_ids:
-            commits_to_create.append(Commit(commitId=commit['id'], data=commit))
+        if commit['id'] not in existing_combinations:
+            commits_to_create.append(Commit(commitId=commit['id'], repositoryId=repository_id, data=commit))
     
     # Bulk create commits, handling any exceptions if they occur
     try:
-        Commit.objects.bulk_create(commits_to_create)
-        print(f"Stored {len(commits_to_create)} unique commits in the database.")
+        Commit.objects.bulk_create(commits_to_create, ignore_conflicts=True)
+        print(f"Stored {len(commits_to_create)} unique commits in the database for repository {repository_id}.")
     except IntegrityError as e:
         print("An error occurred while inserting commits. Some commits may not have been inserted.")
         raise e
-    
+
 #--------------------------Total Contirbutors-----------------------
     
 def fetch_and_store_contributors(repository_id, access_token):

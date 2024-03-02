@@ -3,7 +3,10 @@ from djongo import models
 class MergeRequest(models.Model):
     repositoryId = models.CharField(max_length=100)
     merge_request_id = models.IntegerField()
-    data = models.JSONField()  # Stores the entire merge request data as JSON
+    state = models.CharField(max_length=50)  # New field for merge request state
+    created_at = models.DateTimeField()  # New field for creation date
+    merged_at= models.DateTimeField()
+    # You might still want to keep the data JSONField for storing additional information
 
     class Meta:
         indexes = [
