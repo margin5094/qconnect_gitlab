@@ -62,11 +62,14 @@ class MergeRequestService:
 
         # Calculate average duration per day
         avg_durations = {day: sum(durations) / len(durations) for day, durations in day_durations.items()}
+        
+        # Sort the avg_durations dictionary by its keys (dates) from past to present
+        sorted_avg_durations = dict(sorted(avg_durations.items(), key=lambda item: item[0]))
 
-        # Prepare the response
+        # Prepare the sorted response
         response = {
-            "dates": [day.strftime("%Y-%m-%d") for day in avg_durations.keys()],
-            "times": [avg for avg in avg_durations.values()]
+            "dates": [day.strftime("%Y-%m-%d") for day in sorted_avg_durations.keys()],
+            "times": [avg for avg in sorted_avg_durations.values()]
         }
 
         return response

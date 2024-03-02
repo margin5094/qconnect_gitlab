@@ -3,7 +3,7 @@ from mongoAPI.models.MergeRequestModel import MergeRequest
 from mongoAPI.models.CommitsModel import Commit
 from mongoAPI.models.ContributorsModel import RepositoryContributors
 from django.db import IntegrityError
-from datetime import datetime
+from django.utils.dateparse import parse_datetime
 
 def fetch_and_store_merge_requests(repositoryId, access_token):
     url = f"https://git.cs.dal.ca/api/v4/projects/{repositoryId}/merge_requests"
@@ -15,17 +15,20 @@ def fetch_and_store_merge_requests(repositoryId, access_token):
         merge_requests = response.json()
         
         for mr in merge_requests:
-            created_at = datetime.strptime(mr['created_at'], "%Y-%m-%dT%H:%M:%S.%f%z").isoformat()
-            merged_at = datetime.strptime(mr['merged_at'], "%Y-%m-%dT%H:%M:%S.%f%z").isoformat()
+            # Parse 'created_at' directly
+            created_at = parse_datetime(mr['created_at'])
+            
+            # Check if 'merged_at' is present and parse it; otherwise, use None
+            merged_at = parse_datetime(mr['merged_at']) if mr.get('merged_at') else None
+            
+            # Use the parsed datetime objects directly without converting them back to string
             obj, created = MergeRequest.objects.get_or_create(
                 repositoryId=repositoryId,
                 merge_request_id=mr['id'],
-                defaults={'state': mr['state'], 'created_at': created_at,'merged_at':merged_at}
+                defaults={'state': mr['state'], 'created_at': created_at, 'merged_at': merged_at}
             )
-
     else:
         raise Exception("Failed to fetch merge requests from the API.")
-
 #---------------------fetch all commits-------------------------------------------------------
 def get_gitlab_branches(repository_id, access_token):
     url = f"https://git.cs.dal.ca/api/v4/projects/{repository_id}/repository/branches"
