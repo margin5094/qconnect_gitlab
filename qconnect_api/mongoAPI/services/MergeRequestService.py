@@ -1,16 +1,21 @@
 from django.db.models import Q
 from datetime import datetime
 from mongoAPI.models.MergeRequestModel import MergeRequest
-
+from django.utils import timezone
+from datetime import timedelta
 from django.db.models import F
-from datetime import datetime
 import pytz
 
 class MergeRequestService:
     @staticmethod
     def get_active_and_new_prs(start_date_str, end_date_str, repository_ids):
+        # Parse the start date
         start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-        end_date = datetime.strptime(end_date_str, "%Y-%m-%d")
+        start_date = timezone.make_aware(start_date, timezone.utc)
+        
+        # Parse the end date and adjust it to the end of the day
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d") + timedelta(days=1, microseconds=-1)
+        end_date = timezone.make_aware(end_date, timezone.utc)
 
         # Count of active merge requests before the start date
         active_count = MergeRequest.objects.filter(
@@ -35,7 +40,6 @@ class MergeRequestService:
         ]
 
         return response
-
 #-------------------------avg-close-time-----------------------------
     @staticmethod
     def get_avg_time_to_close(start_date_str, end_date_str, repository_ids):

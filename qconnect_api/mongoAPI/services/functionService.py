@@ -4,6 +4,7 @@ from mongoAPI.models.CommitsModel import Commit
 from mongoAPI.models.ContributorsModel import RepositoryContributors
 from django.db import IntegrityError
 from django.utils.dateparse import parse_datetime
+from datetime import datetime
 
 def fetch_and_store_merge_requests(repositoryId, access_token):
     url = f"https://git.cs.dal.ca/api/v4/projects/{repositoryId}/merge_requests"
@@ -56,7 +57,6 @@ def get_gitlab_commits(repository_id, branch_name, access_token):
 
 def fetch_and_store_commits(repository_id, access_token):
     branches = get_gitlab_branches(repository_id, access_token)
-
     all_commits_dict = {}
 
     for branch in branches:
@@ -64,27 +64,29 @@ def fetch_and_store_commits(repository_id, access_token):
         for commit in branch_commits:
             # Use commit ID as the key to ensure uniqueness
             all_commits_dict[commit['id']] = commit
-    
-    # Convert the dictionary back to a list for further processing or storing
+
     all_commits = list(all_commits_dict.values())
-    
-    # Fetch existing combinations of commit IDs and repository IDs to avoid duplication
     existing_combinations = set(Commit.objects.filter(repositoryId=repository_id).values_list('commitId', flat=True))
-    
-    # Prepare data for bulk insertion, excluding commits that already exist for the repository
+
     commits_to_create = []
     for commit in all_commits:
         if commit['id'] not in existing_combinations:
-            commits_to_create.append(Commit(commitId=commit['id'], repositoryId=repository_id, data=commit))
+            # Parse the committed_date
+            committed_date_parsed = datetime.strptime(commit['committed_date'], "%Y-%m-%dT%H:%M:%S.%f%z")
+            commits_to_create.append(Commit(
+                commitId=commit['id'], 
+                repositoryId=repository_id, 
+                committer_name=commit['committer_name'],
+                committer_email=commit['committer_email'],
+                committed_date=committed_date_parsed
+            ))
     
-    # Bulk create commits, handling any exceptions if they occur
     try:
         Commit.objects.bulk_create(commits_to_create, ignore_conflicts=True)
         print(f"Stored {len(commits_to_create)} unique commits in the database for repository {repository_id}.")
     except IntegrityError as e:
         print("An error occurred while inserting commits. Some commits may not have been inserted.")
         raise e
-
 #--------------------------Total Contirbutors-----------------------
     
 def fetch_and_store_contributors(repository_id, access_token):

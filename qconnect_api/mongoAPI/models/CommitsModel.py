@@ -3,7 +3,9 @@ from djongo import models
 class Commit(models.Model):
     commitId = models.CharField(max_length=255, primary_key=True)
     repositoryId = models.CharField(max_length=255)
-    data = models.JSONField()
+    committer_name = models.CharField(max_length=255, null=True)
+    committer_email = models.EmailField(max_length=255, null=True)
+    committed_date = models.DateTimeField(null=True)
 
     def __str__(self):
         return self.commitId

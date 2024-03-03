@@ -11,8 +11,8 @@ class RepositoryAPIView(APIView):
         repository_name = request.data.get('repositoryName')
         userId='f4613ff9-8160-48f9-af20-5dc03c051e7f'
         
-        fetch_and_store_merge_requests(repositoryId=repository_id,access_token='glpat-_R6egshjt26AmXyc-VTz')
-        # fetch_and_store_commits(repository_id=repository_id,access_token='glpat-_R6egshjt26AmXyc-VTz')
+        # fetch_and_store_merge_requests(repositoryId=repository_id,access_token='glpat-_R6egshjt26AmXyc-VTz')
+        fetch_and_store_commits(repository_id=repository_id,access_token='glpat-_R6egshjt26AmXyc-VTz')
         # fetch_and_store_contributors(repository_id=repository_id,access_token='glpat-_R6egshjt26AmXyc-VTz')
 
         # Basic validation
