@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Count
 from mongoAPI.models.CommitsModel import Commit
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
@@ -69,3 +69,33 @@ def get_contributors_data(start_date_str, end_date_str, repository_ids):
     }]
 
     return response
+
+
+#--------------top-contributors-------------
+def get_top_active_contributors(start_date_str, end_date_str, repository_ids):
+    start_date = parse_datetime(start_date_str)
+    end_date = parse_datetime(end_date_str)
+
+    if timezone.is_naive(start_date):
+        start_date = timezone.make_aware(start_date, timezone.utc)
+    if timezone.is_naive(end_date):
+        end_date = timezone.make_aware(end_date, timezone.utc)
+    
+    # Aggregate commits by committer_email
+    commits_data = Commit.objects.filter(
+        repositoryId__in=repository_ids,
+        committed_date__gte=start_date,
+        committed_date__lte=end_date
+    ).values('committer_email').annotate(commits=Count('commitId')).order_by('-commits')[:5]
+
+    # Enrich with committer_name and adjust key names
+    enriched_data = []
+    for data in commits_data:
+        latest_commit = Commit.objects.filter(committer_email=data['committer_email']).latest('committed_date')
+        enriched_data.append({
+            "email": data['committer_email'],
+            "commits": data['commits'],
+            "name": latest_commit.committer_name
+        })
+
+    return enriched_data

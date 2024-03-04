@@ -3,7 +3,7 @@ from mongoAPI.controllers.tokenView import TokenAPIView
 from mongoAPI.controllers.getRepoView import GitLabProjectsView
 from mongoAPI.controllers.addRepositoryView import RepositoryAPIView
 from mongoAPI.controllers.MergeRequestView import PRActiveNew, PRAvgTimeClose
-from mongoAPI.controllers.ContributorsView import ActiveSumContributorsView, ActiveContributorsView
+from mongoAPI.controllers.ContributorsView import ActiveSumContributorsView, ActiveContributorsView, TopActiveContributorsView
 urlpatterns = [
     path('token/', TokenAPIView.as_view(), name='token_api'),
     path('gitlab/projects/', GitLabProjectsView.as_view(), name='gitlab-projects'),
@@ -12,4 +12,5 @@ urlpatterns = [
     path('avg-time-close',  PRAvgTimeClose.as_view(), name='avg_stats'),
     path('active-sum', ActiveSumContributorsView.as_view(), name='active-contributors'),
     path('active', ActiveContributorsView.as_view(), name='contributors-data'),
+    path('most-active', TopActiveContributorsView.as_view(), name='top-active-contributors'),
 ]
