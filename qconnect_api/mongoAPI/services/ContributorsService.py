@@ -49,8 +49,6 @@ def get_contributors_data(start_date_str, end_date_str, repository_ids):
     active_users_list = []
     total_users_list = []
 
-    total_contributors_set = set()
-
     for single_date in (start_date + timezone.timedelta(days=x) for x in range((end_date - start_date).days + 1)):
             # Filter commits for the current day
             daily_commits = [commit for commit in all_contributors_within_range if commit.committed_date.date() == single_date.date()]
