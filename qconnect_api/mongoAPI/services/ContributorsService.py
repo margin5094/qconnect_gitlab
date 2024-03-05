@@ -16,8 +16,8 @@ def get_unique_contributors_count(start_date, end_date, repository_ids):
         end_date_parsed = timezone.make_aware(end_date_parsed, timezone.utc)
 
     # If start_date and end_date are the same, adjust end_date to the end of the day
-    if start_date_parsed.date() == end_date_parsed.date():
-        end_date_parsed = timezone.make_aware(datetime.combine(end_date_parsed, datetime.max.time()), timezone.utc)
+    # if start_date_parsed.date() == end_date_parsed.date():
+    end_date_parsed = timezone.make_aware(datetime.combine(end_date_parsed, datetime.max.time()), timezone.utc)
 
     contributors = Commit.objects.filter(
         Q(repositoryId__in=repository_ids) & 
@@ -26,6 +26,7 @@ def get_unique_contributors_count(start_date, end_date, repository_ids):
 
     return len(set(contributors))
 
+#----------------------------------------------------------------------------------------------------
 def get_contributors_data(start_date_str, end_date_str, repository_ids):
     start_date = parse_datetime(start_date_str)
     end_date = parse_datetime(end_date_str)
@@ -51,22 +52,26 @@ def get_contributors_data(start_date_str, end_date_str, repository_ids):
     total_contributors_set = set()
 
     for single_date in (start_date + timezone.timedelta(days=x) for x in range((end_date - start_date).days + 1)):
-        daily_commits = [commit for commit in all_contributors_within_range if commit.committed_date.date() == single_date.date()]
-        daily_active_emails = {commit.committer_email for commit in daily_commits}
-        
-        total_contributors_set.update(daily_active_emails)
+            # Filter commits for the current day
+            daily_commits = [commit for commit in all_contributors_within_range if commit.committed_date.date() == single_date.date()]
+            daily_active_emails = {commit.committer_email for commit in daily_commits}
 
-        if daily_active_emails or total_contributors_set:
+            # Calculate total unique contributors up to and including the current date
+            total_contributors_up_to_date = Commit.objects.filter(
+                repositoryId__in=repository_ids,
+                committed_date__lt=single_date + timezone.timedelta(days=1)
+            ).values_list('committer_email', flat=True).distinct()
+
             dates_list.append(single_date.strftime("%Y-%m-%d"))
             active_users_list.append(len(daily_active_emails))
-            total_users_list.append(len(total_contributors_set))
+            total_users_list.append(len(set(total_contributors_up_to_date)))
 
-    # Creating the final response
+        # Creating the final response
     response = [{
-        "dates": dates_list,
-        "activeUsers": active_users_list,
-        "totalUsers": total_users_list
-    }]
+            "dates": dates_list,
+            "activeUsers": active_users_list,
+            "totalUsers": total_users_list
+        }]
 
     return response
 
