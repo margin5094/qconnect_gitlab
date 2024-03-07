@@ -1,6 +1,7 @@
 import requests
 from mongoAPI.models.MergeRequestModel import MergeRequest
 from mongoAPI.models.CommitsModel import Commit
+from mongoAPI.models.RepositoryModel import Repository
 from mongoAPI.models.ContributorsModel import RepositoryContributors
 from django.db import IntegrityError
 from django.utils.dateparse import parse_datetime
@@ -108,3 +109,11 @@ def fetch_and_store_contributors(repository_id, access_token):
         print(f"Repository {repository_id} has {total_contributors} unique contributors.")
     else:
         print("Failed to fetch contributors.")
+
+#----------------------------get repo id from object id----------------------------
+# def resolve_repository_ids(objectIds):
+#     try:
+#         repositories = Repository.objects.filter(_id__in=objectIds).values_list('_id', flat=True)
+#         return list(repositories)
+#     except Repository.DoesNotExist:
+#         return None
