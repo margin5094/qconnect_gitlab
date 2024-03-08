@@ -1,12 +1,46 @@
 import requests
 from mongoAPI.models.MergeRequestModel import MergeRequest
 from mongoAPI.models.CommitsModel import Commit
-from mongoAPI.models.RepositoryModel import Repository
+from mongoAPI.models.ProjectsModel import Project
 from mongoAPI.models.ContributorsModel import RepositoryContributors
 from django.db import IntegrityError
 from django.utils.dateparse import parse_datetime
 from datetime import datetime
+from django.http import JsonResponse
 
+#----------------------fetch gitlab projects--------------------
+def fetch_and_store_gitlab_projects(userId, access_token):
+    gitlab_projects_url = 'https://git.cs.dal.ca/api/v4/projects'
+    params = {'membership': 'true', 'per_page': 10000}
+    headers = {'Authorization': f'Bearer {access_token}'}
+    
+    try:
+        response = requests.get(gitlab_projects_url, headers=headers, params=params)
+        response.raise_for_status()
+        projects = response.json()
+        
+        # Ensure keys are strings
+        repo_data = {str(project['id']): project['name'] for project in projects}
+
+        # Correctly use your model's fields
+        obj, created = Project.objects.update_or_create(
+            userId=userId,
+            defaults={'repos': repo_data}
+        )
+        
+        print(f'Object created: {created}, Object ID: {obj.pk}')
+        return {"status": "success", "message": "Projects fetched and stored successfully.", "created": created}
+
+    except requests.exceptions.RequestException as e:
+        print(f'Request error: {str(e)}')
+        return {"status": "error", "message": str(e)}
+
+    except Exception as e:
+        print(f'Unexpected error: {str(e)}')
+        return {"status": "error", "message": "An unexpected error occurred."}
+
+
+#------------------------------fetch_and_store_merge_requests----------------------------
 def fetch_and_store_merge_requests(repositoryId, access_token):
     url = f"https://git.cs.dal.ca/api/v4/projects/{repositoryId}/merge_requests"
     headers = {'Authorization': f'Bearer {access_token}'}
@@ -110,10 +144,3 @@ def fetch_and_store_contributors(repository_id, access_token):
     else:
         print("Failed to fetch contributors.")
 
-#----------------------------get repo id from object id----------------------------
-# def resolve_repository_ids(objectIds):
-#     try:
-#         repositories = Repository.objects.filter(_id__in=objectIds).values_list('_id', flat=True)
-#         return list(repositories)
-#     except Repository.DoesNotExist:
-#         return None
