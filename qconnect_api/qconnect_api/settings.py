@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-)yc5qmaxr&$8-v(3*!yyxs*7^hr&n9wxejb-aa)!ydn8g2t)_@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['qconnect-gitlab.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
