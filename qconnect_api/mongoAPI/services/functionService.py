@@ -2,7 +2,7 @@ import requests
 from mongoAPI.models.MergeRequestModel import MergeRequest
 from mongoAPI.models.CommitsModel import Commit
 from mongoAPI.models.ProjectsModel import Project
-from mongoAPI.models.ContributorsModel import RepositoryContributors
+# from mongoAPI.models.ContributorsModel import RepositoryContributors
 from django.db import IntegrityError
 from django.utils.dateparse import parse_datetime
 from datetime import datetime
@@ -13,7 +13,7 @@ def fetch_and_store_gitlab_projects(userId, access_token):
     gitlab_projects_url = 'https://git.cs.dal.ca/api/v4/projects'
     params = {'membership': 'true', 'per_page': 10000}
     headers = {'Authorization': f'Bearer {access_token}'}
-    
+
     try:
         response = requests.get(gitlab_projects_url, headers=headers, params=params)
         response.raise_for_status()
@@ -28,15 +28,15 @@ def fetch_and_store_gitlab_projects(userId, access_token):
             defaults={'repos': repo_data}
         )
         
-        print(f'Object created: {created}, Object ID: {obj.pk}')
+        # print(f'Object created: {created}, Object ID: {obj.pk}')
         return {"status": "success", "message": "Projects fetched and stored successfully.", "created": created}
 
     except requests.exceptions.RequestException as e:
-        print(f'Request error: {str(e)}')
+        # print(f'Request error: {str(e)}')
         return {"status": "error", "message": str(e)}
 
     except Exception as e:
-        print(f'Unexpected error: {str(e)}')
+        # print(f'Unexpected error: {str(e)}')
         return {"status": "error", "message": "An unexpected error occurred."}
 
 
@@ -124,23 +124,23 @@ def fetch_and_store_commits(repository_id, access_token):
         raise e
 #--------------------------Total Contirbutors-----------------------
     
-def fetch_and_store_contributors(repository_id, access_token):
-    url = f"https://git.cs.dal.ca/api/v4/projects/{repository_id}/repository/contributors"
-    params = {
-        'per_page': 100000
-    }
-    headers = {'Authorization': f'Bearer {access_token}'}
-    response = requests.get(url, headers=headers,params=params)
-    if response.status_code == 200:
-        contributors = response.json()
-        total_contributors = len(contributors)
+# def fetch_and_store_contributors(repository_id, access_token):
+#     url = f"https://git.cs.dal.ca/api/v4/projects/{repository_id}/repository/contributors"
+#     params = {
+#         'per_page': 100000
+#     }
+#     headers = {'Authorization': f'Bearer {access_token}'}
+#     response = requests.get(url, headers=headers,params=params)
+#     if response.status_code == 200:
+#         contributors = response.json()
+#         total_contributors = len(contributors)
         
-        # Update or create the entry in MongoDB
-        RepositoryContributors.objects.update_or_create(
-            repositoryId=repository_id,
-            defaults={'totalContributors': total_contributors},
-        )
-        print(f"Repository {repository_id} has {total_contributors} unique contributors.")
-    else:
-        print("Failed to fetch contributors.")
+#         # Update or create the entry in MongoDB
+#         RepositoryContributors.objects.update_or_create(
+#             repositoryId=repository_id,
+#             defaults={'totalContributors': total_contributors},
+#         )
+#         print(f"Repository {repository_id} has {total_contributors} unique contributors.")
+#     else:
+#         print("Failed to fetch contributors.")
 
