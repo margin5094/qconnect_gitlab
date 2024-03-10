@@ -35,8 +35,9 @@ class MergeRequestService:
 
             # Filter and count in Python
             active_count = sum(
-                1 for mr in merge_requests if mr.created_at < day_start and (mr.merged_at is None or mr.merged_at >= day_end)
+                1 for mr in merge_requests if mr.created_at < day_start and ((mr.merged_at is None and mr.state == 'opened') or (mr.merged_at is not None and mr.merged_at >= day_end))
             )
+
             newly_created_count = sum(
                 1 for mr in merge_requests if day_start <= mr.created_at < day_end
             )
@@ -73,16 +74,17 @@ class MergeRequestService:
                 day_durations[day] = []
             day_durations[day].append(duration)
 
-        # Calculate average duration per day
-        avg_durations = {day: sum(durations) / len(durations) for day, durations in day_durations.items()}
-        
-        # Sort the avg_durations dictionary by its keys (dates) from past to present
-        sorted_avg_durations = dict(sorted(avg_durations.items(), key=lambda item: item[0]))
+        # Calculate average duration per day in hours
+        avg_durations_hours = {day: (sum(durations) / len(durations)) / 60 for day, durations in day_durations.items()}
 
-        # Prepare the sorted response
+        # Sort the avg_durations_hours dictionary by its keys (dates) from past to present
+        sorted_avg_durations_hours = dict(sorted(avg_durations_hours.items(), key=lambda item: item[0]))
+
+        # Prepare the sorted response with times in hours
         response = {
-            "dates": [day.strftime("%Y-%m-%d") for day in sorted_avg_durations.keys()],
-            "times": [avg for avg in sorted_avg_durations.values()]
+            "dates": [day.strftime("%Y-%m-%d") for day in sorted_avg_durations_hours.keys()],
+            "times": [avg for avg in sorted_avg_durations_hours.values()]
         }
 
         return response
+
