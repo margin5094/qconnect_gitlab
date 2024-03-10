@@ -3,41 +3,50 @@ from datetime import datetime
 from mongoAPI.models.MergeRequestModel import MergeRequest
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import F
+from django.db.models import Count, F
 import pytz
 
 class MergeRequestService:
     @staticmethod
     def get_active_and_new_prs(start_date_str, end_date_str, repository_ids):
-        # Parse the start date
-        start_date = datetime.strptime(start_date_str, "%Y-%m-%d")
-        start_date = timezone.make_aware(start_date, timezone.utc)
-        
-        # Parse the end date and adjust it to the end of the day
-        end_date = datetime.strptime(end_date_str, "%Y-%m-%d") + timedelta(days=1, microseconds=-1)
-        end_date = timezone.make_aware(end_date, timezone.utc)
+        # Parse the start and end dates
+        start_date = datetime.fromisoformat(start_date_str).replace(tzinfo=pytz.UTC)
+        end_date = datetime.fromisoformat(end_date_str).replace(tzinfo=pytz.UTC)
 
-        # Count of active merge requests before the start date
-        active_count = MergeRequest.objects.filter(
+        # Fetch merge requests created or still active within the date range
+        merge_requests = MergeRequest.objects.filter(
             Q(repositoryId__in=repository_ids) &
-            Q(created_at__lt=start_date) &  # Dates before start_date
-            Q(state='opened')
-        ).count()
+            (Q(created_at__lte=end_date) | Q(merged_at__isnull=True) | Q(merged_at__gte=start_date))
+        )
 
-        # Count of newly created merge requests within the date range
-        newly_created_count = MergeRequest.objects.filter(
-            Q(repositoryId__in=repository_ids) &
-            Q(created_at__range=(start_date, end_date))
-        ).count()
+        # Initialize response structure
+        response = {
+            "dates": [],
+            "active": [],
+            "newly_created": []
+        }
 
-        # Prepare the response in the desired format
-        response = [
-            {
-                "dates": [start_date_str, end_date_str],
-                "active": active_count,
-                "newly_created": newly_created_count
-            }
-        ]
+        # Process each day in the range
+        current_date = start_date
+        while current_date <= end_date:
+            current_date_str = current_date.strftime("%Y-%m-%d")
+            day_start = current_date
+            day_end = current_date + timedelta(days=1)
+
+            # Filter and count in Python
+            active_count = sum(
+                1 for mr in merge_requests if mr.created_at < day_start and (mr.merged_at is None or mr.merged_at >= day_end)
+            )
+            newly_created_count = sum(
+                1 for mr in merge_requests if day_start <= mr.created_at < day_end
+            )
+
+            if active_count > 0 or newly_created_count > 0:
+                response["dates"].append(current_date_str)
+                response["active"].append(active_count)
+                response["newly_created"].append(newly_created_count)
+
+            current_date += timedelta(days=1)
 
         return response
 #-------------------------avg-close-time-----------------------------

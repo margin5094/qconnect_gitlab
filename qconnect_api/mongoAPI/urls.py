@@ -5,10 +5,12 @@ from mongoAPI.controllers.addRepositoryView import RepositoryAPIView
 from mongoAPI.controllers.MergeRequestView import PRActiveNew, PRAvgTimeClose
 from mongoAPI.controllers.ContributorsView import ActiveSumContributorsView, ActiveContributorsView, TopActiveContributorsView
 from mongoAPI.controllers.getProjectsView import ReposForUserView
+from mongoAPI.controllers.getRepoAddedView import GetAddedRepoView
 urlpatterns = [
     path('token', TokenAPIView.as_view(), name='token_api'),
     path('synchronize', RefreshTokenActionAPIView.as_view(), name='synchronize_api'),
     path('projects', ReposForUserView.as_view(), name='repos-for-user'),
+    path('added-repos', GetAddedRepoView.as_view(), name='repos-for-user'),
     path('repository', RepositoryAPIView.as_view(), name='add_repository'),
     path('active-new', PRActiveNew.as_view(), name='pr_stats'),
     path('avg-time-close',  PRAvgTimeClose.as_view(), name='avg_stats'),
