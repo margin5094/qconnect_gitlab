@@ -2,7 +2,6 @@ from django.db.models import Q, Count
 from mongoAPI.models.CommitsModel import Commit
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-
 from datetime import datetime
 
 def get_unique_contributors_count(start_date, end_date, repository_ids):
@@ -35,43 +34,52 @@ def get_contributors_data(start_date_str, end_date_str, repository_ids):
         start_date = timezone.make_aware(start_date, timezone.utc)
     if timezone.is_naive(end_date):
         end_date = timezone.make_aware(end_date, timezone.utc)
-    
+
     end_date_adjusted = end_date + timezone.timedelta(days=1)
 
-    all_contributors_within_range = Commit.objects.filter(
+    # Fetch all commits once, instead of querying inside the loop.
+    all_commits = Commit.objects.filter(
         Q(repositoryId__in=repository_ids) &
         Q(committed_date__gte=start_date) &
         Q(committed_date__lt=end_date_adjusted)
-    ).only("committer_email", "committed_date")
+    ).order_by('committed_date').values('committer_email', 'committed_date')
 
-    # Initialize lists to collect the data
+    # Convert QuerySet to list to process it multiple times without hitting the database.
+    all_commits_list = list(all_commits)
+
     dates_list = []
     active_users_list = []
     total_users_list = []
 
+    # Pre-calculate all unique committers up to each date for efficiency.
+    total_committers_so_far = set()
+    total_committers_by_date = {}
+    for commit in all_commits_list:
+        commit_date_str = commit['committed_date'].date().strftime("%Y-%m-%d")
+        total_committers_so_far.add(commit['committer_email'])
+        total_committers_by_date[commit_date_str] = len(total_committers_so_far)
+
     for single_date in (start_date + timezone.timedelta(days=x) for x in range((end_date - start_date).days + 1)):
-            # Filter commits for the current day
-            daily_commits = [commit for commit in all_contributors_within_range if commit.committed_date.date() == single_date.date()]
-            daily_active_emails = {commit.committer_email for commit in daily_commits}
+        single_date_str = single_date.strftime("%Y-%m-%d")
+        daily_commits = [commit for commit in all_commits_list if commit['committed_date'].date() == single_date.date()]
+        daily_active_emails = {commit['committer_email'] for commit in daily_commits}
 
-            # Calculate total unique contributors up to and including the current date
-            total_contributors_up_to_date = Commit.objects.filter(
-                repositoryId__in=repository_ids,
-                committed_date__lt=single_date + timezone.timedelta(days=1)
-            ).values_list('committer_email', flat=True).distinct()
+        dates_list.append(single_date_str)
+        active_users_list.append(len(daily_active_emails))
+        total_users_list.append(total_committers_by_date.get(single_date_str, 0))
 
-            dates_list.append(single_date.strftime("%Y-%m-%d"))
-            active_users_list.append(len(daily_active_emails))
-            total_users_list.append(len(set(total_contributors_up_to_date)))
+    # Filter dates with positive active or total users.
+    positive_indices = [i for i, (active, total) in enumerate(zip(active_users_list, total_users_list)) if active > 0 or total > 0]
 
-        # Creating the final response
     response = [{
-            "dates": dates_list,
-            "activeUsers": active_users_list,
-            "totalUsers": total_users_list
-        }]
+        "dates": [dates_list[i] for i in positive_indices],
+        "activeUsers": [active_users_list[i] for i in positive_indices],
+        "totalUsers": [total_users_list[i] for i in positive_indices]
+    }]
 
     return response
+
+
 
 
 #--------------top-contributors-------------
