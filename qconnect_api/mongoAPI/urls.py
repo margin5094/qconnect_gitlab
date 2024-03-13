@@ -18,3 +18,4 @@ urlpatterns = [
     path('active', ActiveContributorsView.as_view(), name='contributors-data'),
     path('most-active', TopActiveContributorsView.as_view(), name='top-active-contributors'),
 ]
+    

@@ -1,0 +1,1 @@
+GITLAB_API_URL = "https://git.cs.dal.ca/api/v4/"

@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 import pika
 import json
-from mongoAPI.services.functionService import fetch_and_store_merge_requests, fetch_and_store_commits
+from mongoAPI.services.functionService import fetch_and_store_merge_requests, fetch_and_store_commits, fetch_and_store_gitlab_projects
 from mongoAPI.services.synchronizeService import get_refresh_token_by_id, get_new_accessToken
 import os
 
@@ -13,13 +13,15 @@ class Command(BaseCommand):
             task_data = json.loads(body)
             repository_ids = task_data['repository_ids']  # This is now a list
             userId = task_data['userId']
+            
             try:
                 refresh_token = get_refresh_token_by_id(token_id=userId)
                 result = get_new_accessToken(refresh_token,token_id=userId)
                 access_token = result['access_token']
+                
             except Exception as e: 
                 print(f'Error getting refresh token!')
-
+            fetch_and_store_gitlab_projects(userId, access_token)
             for repository_id in repository_ids:  # Loop over each repository ID
                 try:
                     print(f'Processing {repository_id}')
