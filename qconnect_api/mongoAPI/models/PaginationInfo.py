@@ -7,3 +7,6 @@ class PaginationInfo(models.Model):
 
     class Meta:
         db_table = 'repository_info'
+
+    def __str__(self):
+            return self.repository_id
