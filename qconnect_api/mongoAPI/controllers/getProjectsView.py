@@ -8,7 +8,6 @@ class ReposForUserView(APIView):
     def get(self, request):
         userId = 'f4613ff9-8160-48f9-af20-5dc03c051e7f'
         try:
-            print(f'called!')
             project = Project.objects.get(userId=userId)
             
             return Response(project.repos)

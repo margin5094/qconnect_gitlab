@@ -17,17 +17,7 @@ class RefreshTokenActionAPIView(APIView):
             'repository_ids': repo_ids,
             'userId': userId
         }
-        # -------------------------------------------------------------------------
-        # repository_ids = task_data['repository_ids'] 
-        # refresh_token = get_refresh_token_by_id(token_id=userId)
-        # result = get_new_accessToken(refresh_token,token_id=userId)
-        # access_token = result['access_token']
 
-        # for repository_id in repository_ids:  # Loop over each repository ID
-    
-        #     fetch_and_store_commits(repository_id=repository_id, access_token=access_token)
-        
-        # -------------------------------------------------------------------------
         send_task_to_queue(task_data)
         result = {
             'status': 'success',
