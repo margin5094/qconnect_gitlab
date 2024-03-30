@@ -1,0 +1,512 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "Your API Title",
+        "description": "Your API Description",
+        "termsOfService": "https://www.example.com/policies/terms/",
+        "contact": {
+            "email": "contact@example.com"
+        },
+        "license": {
+            "name": "MIT License"
+        },
+        "version": "v1"
+    },
+    "basePath": "/api",
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "securityDefinitions": {
+        "Basic": {
+            "type": "basic"
+        }
+    },
+    "security": [
+        {
+            "Basic": []
+        }
+    ],
+    "paths": {
+        "/active": {
+            "post": {
+                "operationId": "active_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "startDate",
+                        "in": "query",
+                        "description": "Start date for the range of activity (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "description": "End date for the range of activity (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "repositoryIds",
+                        "in": "query",
+                        "description": "List of repository IDs",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "dates": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "activeUsers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "totalUsers": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing required parameters"
+                    }
+                },
+                "tags": [
+                    "active"
+                ]
+            },
+            "parameters": []
+        },
+        "/active-new": {
+            "post": {
+                "operationId": "active-new_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "startDate",
+                        "in": "query",
+                        "description": "Start date for the range of merge requests (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "description": "End date for the range of merge requests (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "repositoryIds",
+                        "in": "query",
+                        "description": "List of repository IDs",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "dates": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "active": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "newly_created": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "integer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing required parameters"
+                    }
+                },
+                "tags": [
+                    "active-new"
+                ]
+            },
+            "parameters": []
+        },
+        "/active-sum": {
+            "post": {
+                "operationId": "active-sum_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "startDate",
+                        "in": "query",
+                        "description": "Start date for the range of activity (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "description": "End date for the range of activity (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "repositoryIds",
+                        "in": "query",
+                        "description": "List of repository IDs",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "count": {
+                                    "type": "integer"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing required parameters"
+                    }
+                },
+                "tags": [
+                    "active-sum"
+                ]
+            },
+            "parameters": []
+        },
+        "/added-repos": {
+            "get": {
+                "operationId": "added-repos_list",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "status": {
+                                    "type": "string"
+                                },
+                                "repoIds": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Repository not found"
+                    }
+                },
+                "tags": [
+                    "added-repos"
+                ]
+            },
+            "parameters": []
+        },
+        "/avg-time-close": {
+            "post": {
+                "operationId": "avg-time-close_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "startDate",
+                        "in": "query",
+                        "description": "Start date for the range of merge requests (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "description": "End date for the range of merge requests (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "repositoryIds",
+                        "in": "query",
+                        "description": "List of repository IDs",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "dates": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                },
+                                "times": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "number",
+                                        "format": "float"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing required parameters"
+                    }
+                },
+                "tags": [
+                    "avg-time-close"
+                ]
+            },
+            "parameters": []
+        },
+        "/most-active": {
+            "post": {
+                "operationId": "most-active_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "startDate",
+                        "in": "query",
+                        "description": "Start date for the range of activity (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "description": "End date for the range of activity (format: YYYY-MM-DD)",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "repositoryIds",
+                        "in": "query",
+                        "description": "List of repository IDs",
+                        "required": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "commits": {
+                                        "type": "integer"
+                                    },
+                                    "name": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing required parameters"
+                    }
+                },
+                "tags": [
+                    "most-active"
+                ]
+            },
+            "parameters": []
+        },
+        "/projects": {
+            "get": {
+                "operationId": "projects_list",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Project not found for the provided userId"
+                    }
+                },
+                "tags": [
+                    "projects"
+                ]
+            },
+            "parameters": []
+        },
+        "/repository": {
+            "post": {
+                "operationId": "repository_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "repositoryId",
+                                "repositoryName"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "repositoryId": {
+                                    "type": "string"
+                                },
+                                "repositoryName": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Repository added successfully!",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "repositoryId": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Missing repositoryId or repositoryName"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "tags": [
+                    "repository"
+                ]
+            },
+            "parameters": []
+        },
+        "/synchronize": {
+            "post": {
+                "operationId": "synchronize_create",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "Synchronization completed successfully."
+                    },
+                    "404": {
+                        "description": "Repository not found"
+                    }
+                },
+                "tags": [
+                    "synchronize"
+                ]
+            },
+            "parameters": []
+        },
+        "/token": {
+            "post": {
+                "operationId": "token_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "access_token",
+                                "refresh_token"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "access_token": {
+                                    "type": "string"
+                                },
+                                "refresh_token": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token saved successfully"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    }
+                },
+                "tags": [
+                    "token"
+                ]
+            },
+            "parameters": []
+        }
+    },
+    "definitions": {}
+}

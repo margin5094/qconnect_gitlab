@@ -2,8 +2,24 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from mongoAPI.services.tokenService import save_token
 from mongoAPI.services.functionService import fetch_and_store_gitlab_projects
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 class TokenAPIView(APIView):
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['access_token', 'refresh_token'],
+            properties={
+                'access_token': openapi.Schema(type=openapi.TYPE_STRING),
+                'refresh_token': openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+        responses={
+            200: "Token saved successfully",
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         access_token = request.data.get('access_token')
         refresh_token = request.data.get('refresh_token')

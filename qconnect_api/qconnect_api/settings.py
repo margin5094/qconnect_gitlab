@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['qconnect-gitlab.onrender.com', 'localhost', '127.0.0.1']
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -40,10 +41,21 @@ INSTALLED_APPS = [
     'djongo',
     'mongoAPI',
     'rest_framework',
+    'rest_framework_simplejwt',
     'corsheaders',
+    'drf_yasg',
 ]
-
-
+from drf_yasg import openapi
+SWAGGER_SETTINGS = {
+    "DEFAULT_INFO": openapi.Info(
+        title="Your API Title",
+        default_version='v1',
+        description="Your API Description",
+        terms_of_service="https://www.example.com/policies/terms/",
+        contact=openapi.Contact(email="contact@example.com"),
+        license=openapi.License(name="MIT License"),
+    ),
+}
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -54,6 +66,11 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
 ]
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 ROOT_URLCONF = 'qconnect_api.urls'
 CORS_ALLOW_ALL_ORIGINS = True

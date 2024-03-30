@@ -88,7 +88,7 @@ def fetch_and_store_merge_requests(repositoryId, access_token):
         repo_info.merge_requests_last_page = page - 1  # Update to the last successfully fetched page
         repo_info.save()
 
-    print(f"Total Merge Requests Fetched: {total_merge_requests_count}")
+    # print(f"Total Merge Requests Fetched: {total_merge_requests_count}")
 
 #---------------------fetch all commits-------------------------------------------------------
     
@@ -186,25 +186,4 @@ def fetch_and_store_commits(repository_id, access_token):
         except IntegrityError as e:
             print(f"An error occurred while inserting commits. Some commits may not have been inserted. Error: {e}")
 
-#--------------------------Total Contirbutors-----------------------
-    
-# def fetch_and_store_contributors(repository_id, access_token):
-#     url = f"https://git.cs.dal.ca/api/v4/projects/{repository_id}/repository/contributors"
-#     params = {
-#         'per_page': 100000
-#     }
-#     headers = {'Authorization': f'Bearer {access_token}'}
-#     response = requests.get(url, headers=headers,params=params)
-#     if response.status_code == 200:
-#         contributors = response.json()
-#         total_contributors = len(contributors)
-        
-#         # Update or create the entry in MongoDB
-#         RepositoryContributors.objects.update_or_create(
-#             repositoryId=repository_id,
-#             defaults={'totalContributors': total_contributors},
-#         )
-#         print(f"Repository {repository_id} has {total_contributors} unique contributors.")
-#     else:
-#         print("Failed to fetch contributors.")
 
