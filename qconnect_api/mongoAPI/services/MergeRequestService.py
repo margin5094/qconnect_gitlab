@@ -50,6 +50,7 @@ class MergeRequestService:
             current_date += timedelta(days=1)
 
         return response
+    
 #-------------------------avg-close-time-----------------------------
     @staticmethod
     def get_avg_time_to_close(start_date_str, end_date_str, repository_ids):

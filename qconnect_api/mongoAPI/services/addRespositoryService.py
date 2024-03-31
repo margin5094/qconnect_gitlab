@@ -2,7 +2,7 @@ from mongoAPI.models.RepositoryModel import Repository
 
 def add_repository(userId, repository_name, repoId):
     try:
-        # Attempt to retrieve an existing repository by userId
+        # Retrieve an existing repository by userId
         repository = Repository.objects.get(userId=userId)
         
         # Ensure repoIds is initialized and properly formatted

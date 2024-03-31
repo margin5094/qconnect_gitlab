@@ -3,8 +3,6 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from mongoAPI.models.RepositoryModel import Repository
 from mongoAPI.controllers.queue import send_task_to_queue
-from mongoAPI.services.functionService import fetch_and_store_merge_requests, fetch_and_store_commits, fetch_and_store_gitlab_projects
-from mongoAPI.services.synchronizeService import get_refresh_token_by_id, get_new_accessToken
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 

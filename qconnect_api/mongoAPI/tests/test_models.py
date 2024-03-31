@@ -144,7 +144,7 @@ class PaginationInfoModelTest(TestCase):
 class MergeRequestModelTest(TestCase):
 
     def setUp(self):
-        # Prepare a merge request instance for testing
+        # Merge request instance for testing
         self.repositoryId = 'repo123'
         self.merge_request_id = 1
         self.state = 'open'
@@ -160,10 +160,7 @@ class MergeRequestModelTest(TestCase):
         )
 
     def test_merge_request_creation(self):
-        """
-        Verify a MergeRequest instance can be successfully created and retrieved,
-        with all fields correctly reflecting the provided values.
-        """
+
         merge_request = MergeRequest.objects.get(merge_request_id=self.merge_request_id)
         self.assertEqual(merge_request.repositoryId, self.repositoryId)
         self.assertEqual(merge_request.state, self.state)
@@ -171,9 +168,7 @@ class MergeRequestModelTest(TestCase):
         self.assertEqual(merge_request.merged_at, self.merged_at)
     
     def test_merge_request_update(self):
-        """
-        Test the ability to update an existing MergeRequest instance's state and merged_at fields.
-        """
+
         updated_state = 'merged'
         updated_merged_at = timezone.now()  # Assuming the merge request is now merged
         MergeRequest.objects.filter(merge_request_id=self.merge_request_id).update(
@@ -185,10 +180,7 @@ class MergeRequestModelTest(TestCase):
         self.assertAlmostEqual(updated_merge_request.merged_at.timestamp(), updated_merged_at.timestamp(), delta=timedelta(seconds=1).total_seconds())
     
     def test_indexes_existence(self):
-        """
-        Verify the defined indexes ('repositoryId', 'merge_request_id') are in place.
-        This test is more about ensuring the model's Meta options are set correctly and might not directly query the database.
-        """
+      
         indexes = MergeRequest._meta.indexes
         self.assertTrue(any(index.fields == ['repositoryId'] for index in indexes), "Index on 'repositoryId' not found")
         self.assertTrue(any(index.fields == ['merge_request_id'] for index in indexes), "Index on 'merge_request_id' not found")

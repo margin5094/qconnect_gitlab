@@ -23,7 +23,7 @@ def fetch_and_store_gitlab_projects(userId, access_token):
         # Ensure keys are strings
         repo_data = {str(project['id']): project['name'] for project in projects}
 
-        # Correctly use your model's fields
+        # Model's fields
         obj, created = Project.objects.update_or_create(
             userId=userId,
             defaults={'repos': repo_data}
@@ -46,7 +46,7 @@ def fetch_and_store_merge_requests(repositoryId, access_token):
     base_url = f"{GITLAB_API_URL}projects/{repositoryId}/merge_requests"
     headers = {'Authorization': f'Bearer {access_token}'}
     
-    # Attempt to fetch the repository info from the database
+    # Attempting to fetch the repository info from the database
     repo_info, created = PaginationInfo.objects.update_or_create(repository_id=repositoryId)
 
     page = repo_info.merge_requests_last_page
@@ -77,7 +77,7 @@ def fetch_and_store_merge_requests(repositoryId, access_token):
                     ))
             
             total_merge_requests_count += len(merge_requests)
-            page += 1  # Increment to fetch the next page
+            page += 1  # Incrementing to fetch the next page
         else:
             raise Exception("Failed to fetch merge requests from the API.")
 
@@ -88,7 +88,6 @@ def fetch_and_store_merge_requests(repositoryId, access_token):
         repo_info.merge_requests_last_page = page - 1  # Update to the last successfully fetched page
         repo_info.save()
 
-    # print(f"Total Merge Requests Fetched: {total_merge_requests_count}")
 
 #---------------------fetch all commits-------------------------------------------------------
     
@@ -162,7 +161,6 @@ def fetch_and_store_commits(repository_id, access_token):
             for commit in branch_commits:
                 all_commits_dict[commit['id']] = commit
 
-    # Don't forget to save the updated last_commit_page for each branch
     repo_info.save()
 
     existing_commit_ids = set(Commit.objects.filter(repositoryId=repository_id).values_list('commitId', flat=True))

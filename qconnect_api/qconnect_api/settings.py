@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-)yc5qmaxr&$8-v(3*!yyxs*7^hr&n9wxejb-aa)!ydn8g2t)_@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['qconnect-gitlab.onrender.com', 'localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -45,6 +44,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
 ]
+
 from drf_yasg import openapi
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": openapi.Info(
@@ -57,6 +57,7 @@ SWAGGER_SETTINGS = {
     ),
 }
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -64,7 +65,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+
 ]
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
@@ -97,19 +98,21 @@ WSGI_APPLICATION = 'qconnect_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
+import os
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
         'NAME': 'gitlab',
         'CLIENT': {
-           'host': 'mongodb+srv://margin0607:margin123@cluster0.viezalv.mongodb.net/',
+           'host': os.getenv('MONGODB_HOST'),  
            'port': 27017,
-            'username': 'margin0607',
-            'password': 'margin123',
-            
+           'username': os.getenv('MONGODB_USERNAME'), 
+           'password': os.getenv('MONGODB_PASSWORD'), 
         }
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators

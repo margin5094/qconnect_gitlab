@@ -6,7 +6,6 @@ class MergeRequest(models.Model):
     state = models.CharField(max_length=50)  # New field for merge request state
     created_at = models.DateTimeField()  # New field for creation date
     merged_at= models.DateTimeField()
-    # You might still want to keep the data JSONField for storing additional information
 
     class Meta:
         indexes = [

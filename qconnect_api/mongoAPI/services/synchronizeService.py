@@ -1,6 +1,8 @@
 from mongoAPI.models.tokenModel import Token
 import requests
 from mongoAPI.services.tokenService import save_token
+from mongoAPI.Constants import GITLAB_AUTH_URL
+import os
 
 def get_refresh_token_by_id(token_id):
     try:
@@ -11,12 +13,12 @@ def get_refresh_token_by_id(token_id):
 
 def get_new_accessToken(refresh_token,token_id):
     # GitLab Application Credentials
-    client_id = 'd105231a78c0ac4bb72663033bac467f917ea8b84c32784a5ad73726b4c12631'
-    client_secret = 'gloas-80ff7bf871df05b305fae4a1c45f701d476cddff2bc3c3fa1212252217dcff5d'
-    redirect_uri = 'http://localhost:3000/callback'
+    client_id = os.getenv('CLIENT_ID')
+    client_secret = os.getenv('CLIENT_SECRET')
+    redirect_uri = os.getenv('REDIRECT_URI ')
     
     # GitLab Token Endpoint for refreshing tokens
-    token_url = 'https://git.cs.dal.ca/oauth/token'
+    token_url = GITLAB_AUTH_URL
     
     # Data to be sent in the POST request
     post_data = {

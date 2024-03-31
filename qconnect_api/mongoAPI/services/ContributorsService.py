@@ -8,7 +8,6 @@ def get_unique_contributors_count(start_date, end_date, repository_ids):
     start_date_parsed = parse_datetime(start_date)
     end_date_parsed = parse_datetime(end_date)
 
-    # Make datetime objects timezone-aware
     if timezone.is_naive(start_date_parsed):
         start_date_parsed = timezone.make_aware(start_date_parsed, timezone.utc)
     if timezone.is_naive(end_date_parsed):
@@ -37,7 +36,7 @@ def get_contributors_data(start_date_str, end_date_str, repository_ids):
 
     end_date_adjusted = end_date + timezone.timedelta(days=1)
 
-    # Fetch all commits once, instead of querying inside the loop.
+    # Fetching all commits once, instead of querying inside the loop.
     all_commits = Commit.objects.filter(
         Q(repositoryId__in=repository_ids) &
         Q(committed_date__gte=start_date) &
@@ -51,7 +50,7 @@ def get_contributors_data(start_date_str, end_date_str, repository_ids):
     active_users_list = []
     total_users_list = []
 
-    # Pre-calculate all unique committers up to each date for efficiency.
+    # Pre-calculating all unique committers up to each date for efficiency.
     total_committers_so_far = set()
     total_committers_by_date = {}
     for commit in all_commits_list:
@@ -68,7 +67,7 @@ def get_contributors_data(start_date_str, end_date_str, repository_ids):
         active_users_list.append(len(daily_active_emails))
         total_users_list.append(total_committers_by_date.get(single_date_str, 0))
 
-    # Filter dates with positive active or total users.
+    # Filter dates with active or total users.
     positive_indices = [i for i, (active, total) in enumerate(zip(active_users_list, total_users_list)) if active > 0 or total > 0]
 
     response = [{
@@ -78,7 +77,6 @@ def get_contributors_data(start_date_str, end_date_str, repository_ids):
     }]
 
     return response
-
 
 
 
@@ -99,7 +97,7 @@ def get_top_active_contributors(start_date_str, end_date_str, repository_ids):
         committed_date__lte=end_date
     ).values('committer_email').annotate(commits=Count('commitId')).order_by('-commits')[:5]
 
-    # Enrich with committer_name and adjust key names
+    # Enriching with committer_name and adjusting key names
     enriched_data = []
     for data in commits_data:
         latest_commit = Commit.objects.filter(committer_email=data['committer_email']).latest('committed_date')
