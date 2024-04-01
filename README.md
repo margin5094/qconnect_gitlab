@@ -12,6 +12,15 @@ QConnect for GitLab is a comprehensive integration tool designed to streamline c
 - Queueing with RabbitMQ: Utilize RabbitMQ for efficient task queuing and background processing.
 - React Authorization: Implement React for streamlined user authorization with GitLab.
 
+## Tech Stack
+
+**Client:** React
+
+**Server:** Django , RabbitMQ (CloudAMQP)
+
+**Database:** MongoDB
+
+
 ## Installation
 
 To install QConnect for GitLab (API's), follow these steps:
@@ -51,9 +60,24 @@ To run this project, you will need to add the following environment variables to
 - `MONGODB_USERNAME`: This variable contain the username used to authenticate with MongoDB server.
 
 - `MONGODB_PASSWORD`: This variable contain the password used to authenticate with MongoDB server.
+## Constants
+
+Constants in project can be changed according to the needs:
+
+- `GITLAB_API_URL`: The base URL for the GitLab API.
+  - Value: `https://git.cs.dal.ca/api/v4/` (For Dalhousie University specific GitLab accounts)
+  - Value: `https://gitlab.com/api/v4/` (For general GitLab accounts)
+- `GITLAB_AUTH_URL`: The URL for GitLab OAuth token generation.
+  - Value: `https://git.cs.dal.ca/oauth/token`
+  - Value: `https://gitlab.com/oauth/token`
+
+
+- `SAVE_TOKEN`: The URL where the token is saved, replaced with the appropriate server domain where backend code is deployed.
+  - Value: `http://127.0.0.1:8000/api/token` (For localhost testing)
+  - Value: `https://{DOMAIN NAME}/api/token` (For deployed version)
 ## Demo
 
-Check out our demo to see QConnect for GitLab in action!
+Check out demo to see QConnect for Gitlab!
 
 [DEMO LINK (Recorded)](https://dalu-my.sharepoint.com/:v:/g/personal/mr353045_dal_ca/EevtTUDedjhEsXMWY-qsFPcBMTIeZK54j-kg3XMyL0YpGw)
 
@@ -83,7 +107,7 @@ coverage report
 ```
 ## API Documentation
 
-View the API documentation on [SwaggerHub](https://app.swaggerhub.com/apis-docs/your-username/your-api-name)
+View the API documentation on [SwaggerHub](https://app.swaggerhub.com/apis/MarginPatel/qconnect_gitlab/v1#/)
 
 ## Support
 
@@ -97,12 +121,4 @@ For queries, email marginpatel@dal.ca (Margin Patel)
 
 ## Credits
 
-I extend my sincere gratitude to Dr. Tushar Sharma and Indranil Palit for their continuous help and unwavering support throughout this project.
-## Tech Stack
-
-**Client:** React
-
-**Server:** Django , RabbitMQ (CloudAMQP)
-
-**Database:** MongoDB
-
+I extend my sincere gratitude to Dr. Tushar Sharma and Indranil Palit for their continuous help and support throughout this project.
