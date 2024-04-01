@@ -103,15 +103,18 @@ class ActiveContributorsView(APIView):
                         properties={
                             "dates": openapi.Schema(
                                 type=openapi.TYPE_ARRAY,
-                                items=openapi.Schema(type=openapi.TYPE_STRING)
+                                items=openapi.Schema(type=openapi.TYPE_STRING),
+                                description="List of dates mentioned in the range"
                             ),
                             "activeUsers": openapi.Schema(
                                 type=openapi.TYPE_ARRAY,
-                                items=openapi.Schema(type=openapi.TYPE_INTEGER)
+                                items=openapi.Schema(type=openapi.TYPE_INTEGER),
+                                description="List of active users for corresponsing date"
                             ),
                             "totalUsers": openapi.Schema(
                                 type=openapi.TYPE_ARRAY,
-                                items=openapi.Schema(type=openapi.TYPE_INTEGER)
+                                items=openapi.Schema(type=openapi.TYPE_INTEGER),
+                                description="List of total users for corresponsing date"
                             )
                         }
                     )

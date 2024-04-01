@@ -10,7 +10,6 @@ from mongoAPI.controllers.gitlab_auth import GitLabAuth
 
 urlpatterns = [
     path('gitlab-auth', GitLabAuth.as_view(), name='gitlab_auth'),
-
     path('token', TokenAPIView.as_view(), name='token_api'),
     path('synchronize', RefreshTokenActionAPIView.as_view(), name='synchronize_api'),
     path('projects', ReposForUserView.as_view(), name='repos-for-user'),

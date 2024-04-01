@@ -1,11 +1,11 @@
 {
     "swagger": "2.0",
     "info": {
-        "title": "Your API Title",
-        "description": "Your API Description",
-        "termsOfService": "https://www.example.com/policies/terms/",
+        "title": "QConnect for GitLab",
+        "description": "API's for Merge Requests and Contributors!",
+        "termsOfService": "",
         "contact": {
-            "email": "contact@example.com"
+            "email": "marginpatel@dal.ca"
         },
         "license": {
             "name": "MIT License"
@@ -69,18 +69,21 @@
                                 "type": "object",
                                 "properties": {
                                     "dates": {
+                                        "description": "List of dates mentioned in the range",
                                         "type": "array",
                                         "items": {
                                             "type": "string"
                                         }
                                     },
                                     "activeUsers": {
+                                        "description": "List of active users for corresponsing date",
                                         "type": "array",
                                         "items": {
                                             "type": "integer"
                                         }
                                     },
                                     "totalUsers": {
+                                        "description": "List of total users for corresponsing date",
                                         "type": "array",
                                         "items": {
                                             "type": "integer"
@@ -307,6 +310,53 @@
                 },
                 "tags": [
                     "avg-time-close"
+                ]
+            },
+            "parameters": []
+        },
+        "/gitlab-auth": {
+            "post": {
+                "operationId": "gitlab-auth_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "required": [
+                                "code"
+                            ],
+                            "type": "object",
+                            "properties": {
+                                "code": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Token retrieved successfully",
+                        "schema": {
+                            "type": "object",
+                            "properties": {
+                                "message": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Code not provided"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                },
+                "tags": [
+                    "gitlab-auth"
                 ]
             },
             "parameters": []

@@ -48,13 +48,13 @@ INSTALLED_APPS = [
 from drf_yasg import openapi
 SWAGGER_SETTINGS = {
     "DEFAULT_INFO": openapi.Info(
-        title="Your API Title",
+        title="QConnect for GitLab",
         default_version='v1',
-        description="Your API Description",
-        terms_of_service="https://www.example.com/policies/terms/",
-        contact=openapi.Contact(email="contact@example.com"),
+        description="API's for Merge Requests and Contributors!",
+        terms_of_service="",
+        contact=openapi.Contact(email="marginpatel@dal.ca"),
         license=openapi.License(name="MIT License"),
-    ),
+    )
 }
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

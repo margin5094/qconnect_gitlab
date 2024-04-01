@@ -5,7 +5,30 @@ from mongoAPI.Constants import SAVE_TOKEN
 import requests
 import os
 
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
+
 class GitLabAuth(APIView):
+    @swagger_auto_schema(
+    request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            required=['code'],
+            properties={
+                'code': openapi.Schema(type=openapi.TYPE_STRING)
+            }
+        ),
+        responses={
+            200: openapi.Response(description="Token retrieved successfully", schema=openapi.Schema(
+                type=openapi.TYPE_OBJECT,
+                properties={
+                    'message': openapi.Schema(type=openapi.TYPE_STRING)
+                }
+            )),
+            400: "Code not provided",
+            500: "Internal Server Error"
+        }
+    )
     def post(self, request):
         code = request.data.get('code')
         if code:
