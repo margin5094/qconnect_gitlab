@@ -51,5 +51,4 @@ Dockerfile
 docker-compose.yml
 .dockerignore
 
-# Dependency directories
-node_modules/
+**node_modules
