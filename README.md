@@ -1,8 +1,6 @@
-
 # QConnect for GitLab
 
 QConnect for GitLab is a comprehensive integration tool designed to streamline collaboration and communication within GitLab projects. By leveraging GitLab APIs, Django, React, MongoDB, and RabbitMQ, it facilitates the seamless retrieval and storage of GitLab user data, enabling users to generate customized queries and fetch data efficiently.
-
 
 ## Features
 
@@ -19,7 +17,6 @@ QConnect for GitLab is a comprehensive integration tool designed to streamline c
 **Server:** Django , RabbitMQ (CloudAMQP)
 
 **Database:** MongoDB
-
 
 ## Installation
 
@@ -43,6 +40,7 @@ python manage.py runserver
 # Start the RabbitMQ Consumer
 python manage.py consumer
 ```
+
 ## Environment Variables
 
 To run this project, you will need to add the following environment variables to your `.env` file in home directory:
@@ -60,6 +58,7 @@ To run this project, you will need to add the following environment variables to
 - `MONGODB_USERNAME`: This variable contain the username used to authenticate with MongoDB server.
 
 - `MONGODB_PASSWORD`: This variable contain the password used to authenticate with MongoDB server.
+
 ## Constants
 
 Constants in project can be changed according to the needs:
@@ -68,18 +67,13 @@ Constants in project can be changed according to the needs:
   - Value: `https://git.cs.dal.ca/api/v4/` (For Dalhousie University specific GitLab accounts)
   - Value: `https://gitlab.com/api/v4/` (For general GitLab accounts)
 - `GITLAB_AUTH_URL`: The URL for GitLab OAuth token generation.
+
   - Value: `https://git.cs.dal.ca/oauth/token`
   - Value: `https://gitlab.com/oauth/token`
-
 
 - `SAVE_TOKEN`: The URL where the token is saved, replaced with the appropriate server domain where backend code is deployed.
   - Value: `http://127.0.0.1:8000/api/token` (For localhost testing)
   - Value: `https://{DOMAIN NAME}/api/token` (For deployed version)
-## Demo
-
-Check out demo to see QConnect for Gitlab!
-
-[DEMO LINK (Recorded)](https://dalu-my.sharepoint.com/:v:/g/personal/mr353045_dal_ca/EevtTUDedjhEsXMWY-qsFPcBMTIeZK54j-kg3XMyL0YpGw)
 
 ## Optimizations
 
@@ -100,11 +94,13 @@ Code coverage of 90% is acheived here. To run tests for Django and measure code 
 ```bash
 coverage run manage.py test
 ```
+
 To generate coverage report run following command:
 
 ```bash
 coverage report
 ```
+
 ## API Documentation
 
 View the API documentation on [SwaggerHub](https://app.swaggerhub.com/apis/MarginPatel/qconnect_gitlab/v1#/)
@@ -113,11 +109,9 @@ View the API documentation on [SwaggerHub](https://app.swaggerhub.com/apis/Margi
 
 For queries, email marginpatel@dal.ca (Margin Patel)
 
-
 ## Authors
 
 - [Margin Patel](https://github.com/margin5094)
-
 
 ## Credits
 
